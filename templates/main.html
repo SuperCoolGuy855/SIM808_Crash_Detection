@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Crash detection</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <nav class="navbar bg-body-tertiary">
+        <div class="container-fluid">
+            <a class="mx-3 navbar-brand" href="#">Crash Detection</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div id="map"></div>
+
+        <!-- Notification button -->
+        <span class="my-3 d-inline-block" id="notification_span" tabindex="0" data-bs-toggle="tooltip">
+            <button type="button" class="btn btn-primary" id="notification_button"
+                onclick="enable_notification()">Enable crash notification</button>
+        </span>
+        <!-- <buttion type="button" class="btn btn-primary" id="notification_test" onclick="test_notification()">Test
+            notification</buttion> -->
+        <buttion type="button" class="btn btn-primary" id="google_maps" onclick="show_google_maps()">Show on Google Maps</buttion>
+
+        <!-- Crash history, use Jinja template -->
+        <table class="table table-hover" id="crash_history">
+            <thead>
+                <th scope="col">#</th>
+                <th scope="col">Time</th>
+                <th scope="col">Latitude</th>
+                <th scope="col">Longitude</th>
+            </thead>
+            <tbody>
+                {% for data in history %}
+                <tr onclick="change_location({{loop.index0}})">
+                    <th scope="row">{{loop.index0 + 1}}</th>
+                    <td class="time">{{ data.time }}</td>
+                    <td>{{ data.lat }}</td>
+                    <td>{{ data.lng }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script>
+        let crash_history = {{ history | safe }};
+        let save_sub_url = "{{ url_for('save_sub') }}";
+        let service_worker_url = "{{ url_for('static', filename='service-worker.js') }}";
+        let public_key = "{{ public_key }}";
+    </script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+
+</html>
