@@ -46,7 +46,7 @@ To start the server in development mode, run:
 flask run --debug
 ```
 
-Then you can access the server with [http://locahost:5000]()
+Then you can access the server with [http://localhost:5000/](http://localhost:5000/)
 
 #### Production mode
 
