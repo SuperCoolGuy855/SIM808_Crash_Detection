@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 ### Enviroment variable
 
-Create the following enviroment variable using file `.env` or adding in the terminal:
+Create the following enviroment variable:
 
 - **VAPID_PUBLIC_KEY**: used to send notifications
   
@@ -28,6 +28,7 @@ Create the following enviroment variable using file `.env` or adding in the term
   
 - **TEST_PASSWORD** (optional, `default="12345678"`): set the password for sending test notifications
   
+Generate VAPID keys using [VAPID Key Generator](https://www.attheminute.com/vapid-key-generator)
 
 ### Starting server
 
