@@ -7,10 +7,6 @@ import os
 import json
 import datetime
 
-load_dotenv()
-CRASH_HISTORY_FILE = "crash_history.json"
-NOTIFICATION_SUBSCRIPTIONS_FILE = "noti_sub.json"
-
 
 def get_crash_history():
     if not os.path.exists(CRASH_HISTORY_FILE):
@@ -67,7 +63,9 @@ def send_noti(message, title="Crash detected"):
                 subscription_info=sub,
                 data=json.dumps({"title": title, "message": message}),
                 vapid_private_key=os.getenv("VAPID_PRIVATE_KEY"),
-                vapid_claims={"sub": "mailto:minhminh99599@gmail.com"},
+                vapid_claims={
+                    "sub": f"mailto:{os.getenv('EMAIL', 'example@example.com')}"
+                },
             )
         except WebPushException as ex:
             if ex.response.status_code in [410, 404]:
@@ -89,6 +87,17 @@ def send_noti(message, title="Crash detected"):
                 # No json in response
                 pass
 
+
+load_dotenv()
+CRASH_HISTORY_FILE = os.getenv("CRASH_HISTORY_FILE", "crash_history.json")
+NOTIFICATION_SUBSCRIPTIONS_FILE = os.getenv(
+    "NOTIFICATION_SUBSCRIPTIONS_FILE", "noti_sub.json"
+)
+
+if not os.getenv("VAPID_PRIVATE_KEY"):
+    raise Exception("VAPID_PRIVATE_KEY not set")
+if not os.getenv("VAPID_PUBLIC_KEY"):
+    raise Exception("VAPID_PUBLIC_KEY not set")
 
 app = Flask(__name__)
 
@@ -156,6 +165,7 @@ def save_sub():
     try:
         data = request.get_json(force=True)
     except Exception:
+        app.logger.error("Invalid subscription data")
         return jsonify({"message": "Invalid request"}), 400
 
     app.logger.info(f"Subscription endpoint: {data['endpoint']}")

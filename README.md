@@ -24,6 +24,12 @@ Create the following enviroment variable:
   
 - **VAPID_PRIVATE_KEY**: used to send notifications
   
+- **CRASH_HISTORY_FILE** (optional, `default="crash_history.json"`): path to json file for storing crash history
+  
+- **NOTIFICATION_SUBSCRIPTIONS_FILE** (optional, `default="noti_sub.json"`): path to json file for storing notification subscriptions
+
+- **EMAIL** (optional, `default="example@example.com"`): email for VAPID claim
+  
 - **LOG_LEVEL** (optional, `default="INFO"`): set the logging level (see: [Logging Flask Documentation](https://flask.palletsprojects.com/en/3.0.x/logging/), [Logging facility for Python](https://docs.python.org/3/library/logging.html))
   
 - **TEST_PASSWORD** (optional, `default="12345678"`): set the password for sending test notifications
