@@ -7,6 +7,21 @@ import os
 import json
 import datetime
 
+import pprint
+
+class LoggingMiddleware(object):
+    def __init__(self, app):
+        self._app = app
+
+    def __call__(self, env, resp):
+        errorlog = env['wsgi.errors']
+        pprint.pprint(('REQUEST', env), stream=errorlog)
+
+        def log_response(status, headers, *args):
+            pprint.pprint(('RESPONSE', status, headers), stream=errorlog)
+            return resp(status, headers, *args)
+
+        return self._app(env, log_response)
 
 def get_crash_history():
     if not os.path.exists(CRASH_HISTORY_FILE):
@@ -101,6 +116,7 @@ if not os.getenv("VAPID_PUBLIC_KEY"):
 
 app = Flask(__name__)
 
+# app.wsgi_app = LoggingMiddleware(app.wsgi_app)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 app.logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
@@ -120,13 +136,15 @@ def index():
 def crash():
     app.logger.info("Crash detected")
 
+    app.logger.debug(f"Data: {request.get_data()}")
+
     try:
         time = request.form["time"]
         lat = request.form["lat"]
         lng = request.form["long"]
     except KeyError:
         app.logger.error("Malformed request")
-        return jsonify({"message": "Missing parameters"}), 400
+        return jsonify({"message": "Malformed request"}), 400
 
     app.logger.debug(f"Before parsing: time: {time}, lat: {lat}, long: {lng}")
 
