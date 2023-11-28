@@ -15,7 +15,7 @@
 
 #define SIM808_INIT_DELAY 1000
 #define GPS_NOT_FIX_DELAY 500
-#define GPRS_RETRY_DELAY 1500
+#define GPRS_RETRY_DELAY 2000
 #define ACCEL_POLL_DELAY 250
 
 #define BUFFER_SIZE 512
@@ -24,8 +24,9 @@
 #define GPRS_USER F("mms")
 #define GPRS_PASS F("mms")
 
-#define URL "codescore.ddns.net"
-#define PORT 80
+#define URL F("codescore.ddns.net")
+
+#define THRESHOLD 15
 
 int ADXL345 = 0x53;  // The ADXL345 sensor I2C address
 int oldx, oldy, oldz;
@@ -77,7 +78,7 @@ void accel_init() {
 }
 
 void gps_init() {
-  if (sim808_check_with_cmd("AT+CGNSPWR=1\r\n", "OK\r\n", CMD))
+  if (sim808_check_with_cmd("AT+CGPSPWR=1\r\n", "OK\r\n", CMD))
     Serial.println("Open the GPS power success");
   else {
     Serial.println("Open the GPS power failure");
@@ -277,7 +278,9 @@ bool http_post() {
     return false;
   }
 
-  if (!sim808_check_with_cmd(F("AT+HTTPPARA=\"URL\", \"http://codescore.ddns.net/crash\"\r\n"), "OK\r\n", CMD)) {
+  sim808_send_cmd(F("AT+HTTPPARA=\"URL\", \""));
+  sim808_send_cmd(URL);
+  if (!sim808_check_with_cmd(F("/crash\"\r\n"), "OK\r\n", CMD)) {
     Serial.println(F("Failed to set URL"));
     return false;
   }
