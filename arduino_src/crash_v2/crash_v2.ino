@@ -343,7 +343,7 @@ void impact_detection() {
   // double magnitude = sqrt(sq(deltax) + sq(deltay) + sq(deltaz));
   double magnitude = sqrt(sq(x) + sq(y) + sq(z));
   // Serial.println(magnitude);
-  if (magnitude > 16) {
+  if (magnitude > THRESHOLD) {
     digitalWrite(LED_BUILTIN, LOW);
     Serial.println(F("Impact detected"));
     Serial.print(F("Magnitude: "));
